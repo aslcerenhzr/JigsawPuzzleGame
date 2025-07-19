@@ -53,9 +53,40 @@ public class PuzzleGenerator : MonoBehaviour
                 puzzlePieceInstance.Configure(gridScale, tiling, offset, correctPos);
             }
         }
+
+        ConfigureNeighbors();
     }
 
+    private void ConfigureNeighbors()
+    {
+        for(int i = 0;i < puzzlePieces.Count;i++) 
+            ConfigurePieceNeighbors(puzzlePieces[i], i);
+    }
+
+    private void ConfigurePieceNeighbors(PuzzlePiece piece, int index)
+    {
+        Vector2Int gridPos = IndexToGridPos(index);
+
+        int x = gridPos.x;
+        int y = gridPos.y;
+
+        PuzzlePiece rightPiece = IsValidGridPos(x+1, y) ? transform.GetChild(GridIndexFromPos(x+1, y)).GetComponent<PuzzlePiece>() : null;
+        PuzzlePiece leftPiece = IsValidGridPos(x - 1, y) ? transform.GetChild(GridIndexFromPos(x - 1, y)).GetComponent<PuzzlePiece>() : null;
+        PuzzlePiece bottomPiece = IsValidGridPos(x, y-1) ? transform.GetChild(GridIndexFromPos(x, y-1)).GetComponent<PuzzlePiece>() : null;
+        PuzzlePiece topPiece = IsValidGridPos(x, y + 1) ? transform.GetChild(GridIndexFromPos(x, y + 1)).GetComponent<PuzzlePiece>() : null;
+
+        piece.SetNeighbors(rightPiece, leftPiece, bottomPiece, topPiece);
+    }
+
+    private bool IsValidGridPos(int x, int y) => x >= 0 && y >= 0 && x < gridSize && y < gridSize;
     private int GridIndexFromPos(int i, int j) => j + gridSize * i;
+
+    private Vector2Int IndexToGridPos(int index)
+    {
+        int x = index / gridSize;
+        int y = (int)(((float)index) % gridSize);
+        return new Vector2Int(x, y);
+    }
 
     public PuzzlePiece[] GetPuzzlePieces()
     {

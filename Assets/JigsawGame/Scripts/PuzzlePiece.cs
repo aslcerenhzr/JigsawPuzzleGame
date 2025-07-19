@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 
+
 public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
 {
     [Header(" Elements ")]
@@ -11,6 +12,11 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
 
     [Header(" Validation ")]
     private Vector3 correctPosition;
+
+    [Header(" Neighbors ")]
+    private PuzzlePiece[] neighbors;
+
+
     public bool IsValid { get; private set; }
 
     public void Configure(float scale, Vector2 tiling, Vector2 offset, Vector3 correctPos)
@@ -21,6 +27,11 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
         renderer.material.mainTextureOffset = offset;
 
         this.correctPosition = correctPos;
+    }
+
+    public void SetNeighbors(params PuzzlePiece[] puzzlePieces)
+    {
+        neighbors = puzzlePieces;
     }
 
     public void StartMoving()
@@ -36,13 +47,23 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
 
     public void StopMoving()
     {
-        CheckForValidation();
+        bool isValid = CheckForValidation();
+
+        if (isValid) 
+            return;
+        
+        CheckForNeighbors();
     }
 
-    private void CheckForValidation()
+    private bool CheckForValidation()
     {
         if (IsCloseToCorrectPos())
+        {
             Validate();
+            return true;
+        }
+        return false;
+            
     }
 
     private bool IsCloseToCorrectPos()
@@ -53,6 +74,27 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
     private float GetMinValidDistance()
     {
         return MathF.Max(.05f, transform.localScale.x / 5);
+    }
+
+    private void CheckForNeighbors()
+    {
+        for (int i = 0; i < neighbors.Length; i++)
+        {
+            if (neighbors[i] == null)
+                continue;
+            if (neighbors[i].IsValid)
+                continue;
+
+            Vector3 correctLocalPos = Quaternion.Euler(0, 0, -90 * i) * Vector3.right * transform.localScale.x;
+
+            Vector3 correctWorldPos = transform.position + correctLocalPos;
+            correctWorldPos.z = neighbors[i].transform.position.z;
+
+            if (Vector3.Distance(correctWorldPos, neighbors[i].transform.position) < GetMinValidDistance())
+            {
+                //5 durum kodlancak
+            }
+        }
     }
 
     private void Validate()
