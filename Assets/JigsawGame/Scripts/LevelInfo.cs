@@ -8,4 +8,5 @@ public class LevelInfo
     public string levelName;
     public int size;
     public Material puzzleMaterial;
+    public bool isUnlocked;
 }

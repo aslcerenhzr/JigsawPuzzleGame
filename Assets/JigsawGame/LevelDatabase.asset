@@ -16,6 +16,12 @@ MonoBehaviour:
   - levelName: 1
     size: 2
     puzzleMaterial: {fileID: 2100000, guid: 9159f68c3a6fd394eaae53f43028672f, type: 2}
+    isUnlocked: 1
   - levelName: 2
     size: 3
+    puzzleMaterial: {fileID: 2100000, guid: 6970878eac3bdad43b1b4af8eb993c9e, type: 2}
+    isUnlocked: 1
+  - levelName: 3
+    size: 4
     puzzleMaterial: {fileID: 2100000, guid: 9159f68c3a6fd394eaae53f43028672f, type: 2}
+    isUnlocked: 0

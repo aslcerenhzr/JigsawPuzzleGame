@@ -23,7 +23,7 @@ public class LevelSelectManager : MonoBehaviour
             LevelButton levelButton = buttonObj.GetComponent<LevelButton>();
 
 
-            levelButton.Setup(info.puzzleMaterial);
+            levelButton.Setup(info);
         }
     }
 }
