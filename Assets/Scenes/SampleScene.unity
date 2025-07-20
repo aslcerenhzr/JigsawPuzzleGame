@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 2086001363}
   puzzlePiecePrefab: {fileID: 3364959023106738841, guid: f2367417cb155c542b652c91103626a6, type: 3}
-  gridSize: 3
+  gridSize: 2
 --- !u!1 &371183465
 GameObject:
   m_ObjectHideFlags: 0
@@ -906,6 +906,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57d81d66b6f17074e87882995a3c5753, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotationSpeed: 360
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

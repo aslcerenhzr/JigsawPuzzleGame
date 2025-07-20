@@ -89,6 +89,7 @@ public class InputManager : MonoBehaviour
                 break;
 
             case State.PuzzlePiece:
+                ManagePieceDoubleInput();
                 break;
         }
     }
@@ -121,6 +122,21 @@ public class InputManager : MonoBehaviour
             if(touch.phase == TouchPhase.Ended)
                 state = State.None;
         }
+    }
+
+    private void ManagePieceDoubleInput() 
+    {
+        Touch[] touches = Input.touches;
+
+        if (touches[1].phase == TouchPhase.Began)
+        {
+            touch1ClickedPos = touches[1].position;
+            controller.StartRotatingPiece();
+        }
+
+        float xDelta = (touches[1].position.x - touch1ClickedPos.x) / Screen.width;
+        controller.RotatePiece(xDelta);
+
     }
 }
 

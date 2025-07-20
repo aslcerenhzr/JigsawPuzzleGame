@@ -43,7 +43,9 @@ public class PuzzleGenerator : MonoBehaviour
                 Vector3 randomPos = Random.onUnitSphere * 2;
                 randomPos.z = correctPos.z;
 
-                PuzzlePiece puzzlePieceInstance = Instantiate(puzzlePiecePrefab, randomPos, Quaternion.identity, transform);
+                Quaternion pieceRot = Quaternion.Euler(0, 0, Random.Range(0, 360));
+
+                PuzzlePiece puzzlePieceInstance = Instantiate(puzzlePiecePrefab, randomPos, pieceRot, transform);
 
                 puzzlePieces.Add(puzzlePieceInstance);
 

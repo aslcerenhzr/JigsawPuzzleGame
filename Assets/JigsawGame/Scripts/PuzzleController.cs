@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 
 public class PuzzleController : MonoBehaviour
 {
@@ -11,7 +12,9 @@ public class PuzzleController : MonoBehaviour
     [Header(" Piece Movement ")]
     private Vector3 startPos;
     private PuzzlePiece currentPiece;
-
+    [Header(" Rotation ")]
+    [SerializeField] private float rotationSpeed;
+    private Quaternion pieceStartRotation;
 
     public void Configure(PuzzleGenerator puzzleGenerator, float gridScale)
     {
@@ -56,6 +59,17 @@ public class PuzzleController : MonoBehaviour
                 puzzlePieces[i].transform.position += Vector3.forward * Constants.pieceZOffset;
             }
         }
+
+        if (currentPiece.Group == null)
+            return;
+        foreach (Transform piece in currentPiece.Group)
+        {
+            Vector3 newPos = piece.position;
+            newPos.z = -highestZ;
+            piece.position = newPos;
+
+        }
+
     }
 
     public void SingleTouchDrag(Vector3 worldPosition)
@@ -99,30 +113,31 @@ public class PuzzleController : MonoBehaviour
         currentPiece = null;
     }
 
-
-    private PuzzlePiece GetClosestPiece(PuzzlePiece[] puzzlePieces, Vector3 worldPosition)
+    public void StartRotatingPiece()
     {
-        float minDistance = 50000;
-        int closestIndex = -1;
+        if (currentPiece == null)
+            return;
 
-        for (int i = 0; i < puzzlePieces.Length; i++)
-        {
-            float distance = Vector3.Distance((Vector2)puzzlePieces[i].transform.position, worldPosition);
+        if (currentPiece.Group == null)
+            pieceStartRotation = currentPiece.transform.rotation;
+        else
+            pieceStartRotation = currentPiece.Group.rotation;
 
-            if (distance > detectionRadius)
-                continue;
-
-            if(distance < minDistance)
-            {
-                minDistance = distance;
-                closestIndex = i;
-            }
-        }
-
-        if(closestIndex < 0)
-            return null;
-
-        return puzzlePieces[closestIndex];
     }
+
+    public void RotatePiece(float xDelta)
+    {
+        if(currentPiece == null)
+            return;
+        float targetAdditionalZAngle = xDelta * rotationSpeed;
+        Quaternion targetRotation = pieceStartRotation * Quaternion.Euler(0, 0, targetAdditionalZAngle);
+
+        if(currentPiece.Group == null)
+            currentPiece.transform.rotation = targetRotation;
+        else
+            currentPiece.Group.rotation = targetRotation;
+    }
+
+
 }
 
