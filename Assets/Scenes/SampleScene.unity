@@ -164,8 +164,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 2086001363}
-  puzzlePiecePrefab: {fileID: 3364959023106738841, guid: f2367417cb155c542b652c91103626a6, type: 3}
-  gridSize: 2
+  puzzlePiecePrefab: {fileID: 7679088837720743910, guid: 4b84f56a2e311334a92921ab975784df, type: 3}
+  gridSize: 3
 --- !u!1 &371183465
 GameObject:
   m_ObjectHideFlags: 0

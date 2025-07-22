@@ -56,32 +56,71 @@ public class PuzzleGenerator : MonoBehaviour
             }
         }
 
-        ConfigureNeighbors();
+        ConfigurePieces();
     }
 
-    private void ConfigureNeighbors()
+    private void ConfigurePieces()
     {
         for(int i = 0;i < puzzlePieces.Count;i++) 
-            ConfigurePieceNeighbors(puzzlePieces[i], i);
+            ConfigurePiece(puzzlePieces[i], i);
     }
 
-    private void ConfigurePieceNeighbors(PuzzlePiece piece, int index)
+    private void ConfigurePiece(PuzzlePiece piece, int index)
     {
         Vector2Int gridPos = IndexToGridPos(index);
 
         int x = gridPos.x;
         int y = gridPos.y;
 
+        int[] trits = GetTrits(x, y);
+
         PuzzlePiece rightPiece = IsValidGridPos(x+1, y) ? transform.GetChild(GridIndexFromPos(x+1, y)).GetComponent<PuzzlePiece>() : null;
         PuzzlePiece leftPiece = IsValidGridPos(x - 1, y) ? transform.GetChild(GridIndexFromPos(x - 1, y)).GetComponent<PuzzlePiece>() : null;
         PuzzlePiece bottomPiece = IsValidGridPos(x, y-1) ? transform.GetChild(GridIndexFromPos(x, y-1)).GetComponent<PuzzlePiece>() : null;
         PuzzlePiece topPiece = IsValidGridPos(x, y + 1) ? transform.GetChild(GridIndexFromPos(x, y + 1)).GetComponent<PuzzlePiece>() : null;
 
+        piece.ConfigureGenerator(trits);
         piece.SetNeighbors(rightPiece, leftPiece, bottomPiece, topPiece);
+    }
+
+    private int[] GetTrits(int x, int y)
+    {
+        int right, bottom, left , top;
+        right = bottom = left = top = 0;
+
+        if (x == 0 && y == 0)
+            return new int[] { GetRandomEdge(), 0, 0, GetRandomEdge() };
+        if(IsValidGridPos(x, y-1))
+        {
+            PuzzlePieceGenerator bottomNeighbor = transform.GetChild(GridIndexFromPos(x, y-1)).GetComponent<PuzzlePiece>().GetGenerator();
+            int[] bottomNeighborTrits = bottomNeighbor.GetTrits();
+
+            int bottomNeighborTopTrit = bottomNeighborTrits[3];
+
+            bottom = bottomNeighborTopTrit == 1 ? 2 : 1;
+        }
+
+        if (IsValidGridPos(x-1,y))
+        {
+            PuzzlePieceGenerator leftNeighbor = transform.GetChild(GridIndexFromPos(x-1, y)).GetComponent<PuzzlePiece>().GetGenerator();
+            int[] leftNeighborTrits = leftNeighbor.GetTrits();
+
+            int leftNeighborRightTrit = leftNeighborTrits[0];
+
+            left = leftNeighborRightTrit == 1 ? 2 : 1;
+        }
+
+        if(IsValidGridPos(x,y+1))
+            top = GetRandomEdge();
+        if(IsValidGridPos(x+1,y))
+            right = GetRandomEdge();
+
+        return new int[] { right, bottom, left, top };
     }
 
     private bool IsValidGridPos(int x, int y) => x >= 0 && y >= 0 && x < gridSize && y < gridSize;
     private int GridIndexFromPos(int i, int j) => j + gridSize * i;
+    private int GetRandomEdge() => Random.Range(1, 3);
 
     private Vector2Int IndexToGridPos(int index)
     {

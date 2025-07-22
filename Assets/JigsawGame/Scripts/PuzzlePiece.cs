@@ -7,6 +7,7 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
 {
     [Header(" Elements ")]
     [SerializeField] private Renderer renderer;
+    [SerializeField] private PuzzlePieceGenerator generator;
 
     [Header(" Movement ")]
     private Vector3 startMovePos;
@@ -29,6 +30,10 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
         this.correctPosition = correctPos;
     }
 
+    public void ConfigureGenerator(int[] trits)
+    {
+        generator.Configure(trits);
+    }
     public void SetNeighbors(params PuzzlePiece[] puzzlePieces)
     {
         neighbors = puzzlePieces;
@@ -213,9 +218,11 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
         Debug.Log("correct place " + name);
     }
 
-
     public int CompareTo(PuzzlePiece otherPiece)
     {
         return transform.position.z.CompareTo(otherPiece.transform.position.z);
     }
+
+    public PuzzlePieceGenerator GetGenerator() => generator;
+    
 }

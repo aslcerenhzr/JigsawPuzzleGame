@@ -1,8 +1,10 @@
-using NUnit.Framework;
-using UnityEngine;
-using System.Collections.Generic;
-
 using Dreamteck.Splines;
+using NUnit.Framework;
+using System.Collections.Generic;
+using UnityEditor.PackageManager.UI;
+using UnityEngine;
+
+using NaughtyAttributes;
 
 public class PuzzlePieceGenerator : MonoBehaviour
 {
@@ -11,38 +13,59 @@ public class PuzzlePieceGenerator : MonoBehaviour
     [SerializeField] private SplineComputer knobSpline;
     [SerializeField] private SplineComputer holeSpline;
 
+
+
+    [Header(" Settings ")]
+    [OnValueChanged("Generate")] [SerializeField] [UnityEngine.Range(0, 2)] private int rightTrit;
+    [OnValueChanged("Generate")][SerializeField][UnityEngine.Range(0, 2)] private int bottomTrit;
+    [OnValueChanged("Generate")][SerializeField][UnityEngine.Range(0, 2)] private int leftTrit;
+    [OnValueChanged("Generate")][SerializeField][UnityEngine.Range(0, 2)] private int topTrit;
+
     List<Vector3> vertices = new List<Vector3>();
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Generate()
     {
+        int[] trits = new int[] { rightTrit, bottomTrit, leftTrit, topTrit };
+        Configure(trits);
+    }
+
+    public void Configure(int[] trits)
+    {
+        vertices.Clear();
+
+        rightTrit = trits[0];
+        bottomTrit = trits[1];
+        leftTrit = trits[2];
+        topTrit = trits[3];
+
         Vector3 topRight = (Vector3.right + Vector3.up) * 0.5f;
         Vector3 bottomRight = topRight + Vector3.down;
         Vector3 bottomLeft = bottomRight + Vector3.left;
         Vector3 topLeft = bottomLeft + Vector3.up;
 
-        Vector3 topMid = (topRight + topLeft) / 2;
+        
         Vector3 rightMid = (topRight + bottomRight) / 2;
         Vector3 bottomMid = (bottomLeft + bottomRight) / 2;
         Vector3 leftMid = (bottomLeft + topLeft) / 2;
+        Vector3 topMid = (topRight + topLeft) / 2;
 
         List<Vector2> v2Vertices = new List<Vector2>();
 
         v2Vertices.Add(topRight);
 
-        ManageRightEdge(rightMid, v2Vertices);
+        ManageEdge(rightMid, v2Vertices, -90, rightTrit);
 
         v2Vertices.Add(bottomRight);
 
-        ManageBottomEdge(bottomMid, v2Vertices);
+        ManageEdge(bottomMid, v2Vertices, -180, bottomTrit);
 
         v2Vertices.Add(bottomLeft);
 
-        ManageLeftEdge(leftMid, v2Vertices);
+        ManageEdge(leftMid, v2Vertices, -270, leftTrit);
 
         v2Vertices.Add(topLeft);
 
-        ManageTopEdge(topMid, v2Vertices);
+        ManageEdge(topMid, v2Vertices, 0, topTrit);
 
         MeshTriangulator triangulator = new MeshTriangulator(v2Vertices.ToArray());
         int[] triangles = triangulator.Triangulate();
@@ -59,70 +82,52 @@ public class PuzzlePieceGenerator : MonoBehaviour
 
     }
 
-    private void ManageTopEdge(Vector3 topMid, List<Vector2> vertices)
+    private void ManageEdge(Vector3 midPoint,  List<Vector2> vertices, float angle, int trit)
     {
-        SampleCollection sampleCollection = new SampleCollection();
-        knobSpline.GetSamples(sampleCollection);
+        Vector3[] edgeVertices = GetEdgeVertices(trit);
 
-        for(int i = 0;i<sampleCollection.length; i++)
+        if(edgeVertices==null)
+            return;
+
+        for (int i = 0;i < edgeVertices.Length;i++)
         {
-            Vector3 sample = sampleCollection.samples[i].position;
-            Vector3 knobVertex = sample * .3f + topMid;
+            Vector3 edgeVertex = edgeVertices[i];
+            Vector3 rotatedSample = Quaternion.Euler(0, 0, angle) * edgeVertex;
+            Vector3 knobVertex = rotatedSample * .3f + midPoint;
 
             vertices.Add(knobVertex);
         }
     }
 
-    private void ManageRightEdge(Vector3 rightMid, List<Vector2> vertices)
+    private Vector3[] GetEdgeVertices(int trit)
     {
         SampleCollection sampleCollection = new SampleCollection();
-        holeSpline.GetSamples(sampleCollection);
+        List<Vector3> vertices = new List<Vector3>();
+
+        switch (trit)
+        {
+            case 0:
+                return null;
+
+            //Knob
+            case 1:
+                knobSpline.GetSamples(sampleCollection);
+                break;
+
+            //Hole
+            case 2:
+                holeSpline.GetSamples(sampleCollection);
+                break;
+
+        }
 
         for (int i = 0; i < sampleCollection.length; i++)
-        {
-            Vector3 sample = sampleCollection.samples[i].position;
-            Vector3 rotatedSample = Quaternion.Euler(0,0,-90) * sample;   
-            Vector3 knobVertex = rotatedSample * .3f + rightMid;
-
-            vertices.Add(knobVertex);
-        }
-    }
-
-    private void ManageBottomEdge(Vector3 bottomMid, List<Vector2> vertices)
+            vertices.Add(sampleCollection.samples[i].position);
+        return vertices.ToArray();
+    }   
+    
+    public int[] GetTrits()
     {
-        SampleCollection sampleCollection = new SampleCollection();
-        knobSpline.GetSamples(sampleCollection);
-
-        for (int i = 0; i < sampleCollection.length; i++)
-        {
-            Vector3 sample = sampleCollection.samples[i].position;
-            Vector3 rotatedSample = Quaternion.Euler(0, 0, -180) * sample;
-            Vector3 knobVertex = rotatedSample * .3f + bottomMid;
-
-            vertices.Add(knobVertex);
-        }
-    }
-
-    private void ManageLeftEdge(Vector3 leftMid, List<Vector2> vertices)
-    {
-        SampleCollection sampleCollection = new SampleCollection();
-        knobSpline.GetSamples(sampleCollection);
-
-        for (int i = 0; i < sampleCollection.length; i++)
-        {
-            Vector3 sample = sampleCollection.samples[i].position;
-            Vector3 rotatedSample = Quaternion.Euler(0, 0, -270) * sample;
-            Vector3 knobVertex = rotatedSample * .3f + leftMid;
-
-            vertices.Add(knobVertex);
-        }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        for (int i = 0; i < vertices.Count; i++) {
-            Gizmos.DrawWireSphere(vertices[i], .1f);
-        }
+        return new int[] {rightTrit,bottomTrit, leftTrit, topTrit};
     }
 }
