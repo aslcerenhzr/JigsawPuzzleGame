@@ -73,13 +73,14 @@ public class PuzzleGenerator : MonoBehaviour
         int y = gridPos.y;
 
         int[] trits = GetTrits(x, y);
+        float[] offsets = GetOffsets(x,y);
 
         PuzzlePiece rightPiece = IsValidGridPos(x+1, y) ? transform.GetChild(GridIndexFromPos(x+1, y)).GetComponent<PuzzlePiece>() : null;
         PuzzlePiece leftPiece = IsValidGridPos(x - 1, y) ? transform.GetChild(GridIndexFromPos(x - 1, y)).GetComponent<PuzzlePiece>() : null;
         PuzzlePiece bottomPiece = IsValidGridPos(x, y-1) ? transform.GetChild(GridIndexFromPos(x, y-1)).GetComponent<PuzzlePiece>() : null;
         PuzzlePiece topPiece = IsValidGridPos(x, y + 1) ? transform.GetChild(GridIndexFromPos(x, y + 1)).GetComponent<PuzzlePiece>() : null;
 
-        piece.ConfigureGenerator(trits);
+        piece.ConfigureGenerator(trits, offsets);
         piece.SetNeighbors(rightPiece, leftPiece, bottomPiece, topPiece);
     }
 
@@ -116,6 +117,42 @@ public class PuzzleGenerator : MonoBehaviour
             right = GetRandomEdge();
 
         return new int[] { right, bottom, left, top };
+    }
+
+    private float[] GetOffsets(int x, int y)
+    {
+        float right, bottom, left, top;
+        right = bottom = left = top = 0;
+
+        if (x == 0 && y == 0)
+            return new float[] { Constants.GetRandomOffset(), 0, 0, Constants.GetRandomOffset() };
+        
+        if (IsValidGridPos(x, y - 1))
+        {
+            PuzzlePieceGenerator bottomNeighbor = transform.GetChild(GridIndexFromPos(x, y - 1)).GetComponent<PuzzlePiece>().GetGenerator();
+            float[] bottomNeighborOffsets = bottomNeighbor.GetOffsets();
+
+            float bottomNeighborTopOffset = bottomNeighborOffsets[3];
+
+            bottom = 1-bottomNeighborTopOffset;
+        }
+
+        if (IsValidGridPos(x - 1, y))
+        {
+            PuzzlePieceGenerator leftNeighbor = transform.GetChild(GridIndexFromPos(x - 1, y)).GetComponent<PuzzlePiece>().GetGenerator();
+            float[] leftNeighborOffsets = leftNeighbor.GetOffsets();
+
+            float leftNeighborRightOffset = leftNeighborOffsets[0];
+
+            left = leftNeighborRightOffset;
+        }
+
+        if (IsValidGridPos(x, y + 1))
+            top = Constants.GetRandomOffset();
+        if (IsValidGridPos(x + 1, y))
+            right = Constants.GetRandomOffset();
+
+        return new float[] { right, bottom, left, top };
     }
 
     private bool IsValidGridPos(int x, int y) => x >= 0 && y >= 0 && x < gridSize && y < gridSize;

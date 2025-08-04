@@ -15,6 +15,7 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
     [Header(" Validation ")]
     private Vector3 correctPosition;
     public bool IsValid { get; private set; }
+    public static Action onValidated;
 
     [Header(" Neighbors ")]
     private PuzzlePiece[] neighbors;
@@ -30,9 +31,9 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
         this.correctPosition = correctPos;
     }
 
-    public void ConfigureGenerator(int[] trits)
+    public void ConfigureGenerator(int[] trits, float[] offsets)
     {
-        generator.Configure(trits);
+        generator.Configure(trits, offsets);
     }
     public void SetNeighbors(params PuzzlePiece[] puzzlePieces)
     {
@@ -202,6 +203,9 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
         transform.rotation = Quaternion.identity;
 
         IsValid = true;
+
+        onValidated?.Invoke();
+
         if(!isRecursive)
             return;
         if (Group == null)
