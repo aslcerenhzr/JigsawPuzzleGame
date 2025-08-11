@@ -21,10 +21,10 @@ public class PuzzleGenerator : MonoBehaviour
 
         controller.Configure(this, gridScale);
 
-        GenerateGrid();
+        //GenerateGrid();
     }
 
-    private void GenerateGrid()
+    public void GeneratePuzzle()
     {
         puzzlePieces.Clear();
 

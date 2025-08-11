@@ -12,8 +12,7 @@ public class PuzzlePieceGenerator : MonoBehaviour
     [SerializeField] private Renderer renderer;
     [SerializeField] private SplineComputer knobSpline;
     [SerializeField] private SplineComputer holeSpline;
-
-
+    [SerializeField] private PuzzlePieceOutline outline;
 
     [Header(" Settings ")]
     [OnValueChanged("Generate")] [SerializeField] [UnityEngine.Range(0, 2)] private int rightTrit;
@@ -103,7 +102,7 @@ public class PuzzlePieceGenerator : MonoBehaviour
         mesh.RecalculateBounds();
 
         renderer.GetComponent<MeshFilter>().mesh = mesh;
-
+        outline.Generate(v2Vertices);
     }
 
     private void ManageEdge(Vector3 midPoint,  List<Vector2> vertices, float angle, int trit)
