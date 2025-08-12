@@ -17,6 +17,15 @@ public class PuzzleGenerator : MonoBehaviour
     void Start()
     {
 
+        if (LevelDataHolder.Instance != null && LevelDataHolder.Instance.SelectedLevelInfo != null)
+        {
+            gridSize = LevelDataHolder.Instance.SelectedLevelInfo.size;
+        }
+        else
+        {
+            gridSize = 3; // fallback default
+        }
+
         gridScale = Constants.puzzleWorldSize / gridSize;
 
         controller.Configure(this, gridScale);
@@ -27,6 +36,9 @@ public class PuzzleGenerator : MonoBehaviour
     public void GeneratePuzzle()
     {
         puzzlePieces.Clear();
+
+        Material mat = LevelDataHolder.Instance?.SelectedLevelInfo?.puzzleMaterial;
+
 
         Vector3 startPos = Vector2.left * (gridSize * gridScale) / 2 + Vector2.down * (gridSize * gridScale) / 2;
         
@@ -47,12 +59,13 @@ public class PuzzleGenerator : MonoBehaviour
 
                 PuzzlePiece puzzlePieceInstance = Instantiate(puzzlePiecePrefab, randomPos, pieceRot, transform);
 
+
                 puzzlePieces.Add(puzzlePieceInstance);
 
                 Vector2 tiling = new Vector2(1f / gridSize, 1f / gridSize);
                 Vector2 offset = new Vector2((float)i /gridSize, (float)j /gridSize);
 
-                puzzlePieceInstance.Configure(gridScale, tiling, offset, correctPos);
+                puzzlePieceInstance.Configure(gridScale, tiling, offset, correctPos, mat);
             }
         }
 

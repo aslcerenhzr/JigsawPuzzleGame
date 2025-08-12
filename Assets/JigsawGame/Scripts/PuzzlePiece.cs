@@ -21,10 +21,11 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
     private PuzzlePiece[] neighbors;
     public Transform Group { get; private set; }
 
-    public void Configure(float scale, Vector2 tiling, Vector2 offset, Vector3 correctPos)
+    public void Configure(float scale, Vector2 tiling, Vector2 offset, Vector3 correctPos, Material material)
     {
         transform.localScale = Vector3.one * scale;
 
+        renderer.material = material;
         renderer.material.mainTextureScale = tiling;
         renderer.material.mainTextureOffset = offset;
 
