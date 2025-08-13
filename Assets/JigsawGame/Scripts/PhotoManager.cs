@@ -10,9 +10,6 @@ public class PhotoManager : MonoBehaviour
     [Header(" Events ")]
     public static Action<Texture2D> onPhotoTaken;
 
-    [Header(" Elements ")]
-    [SerializeField] private PhotoCropUI photoCropUI;
-    [SerializeField] private Button takePictureButton;
 
 
     public void TakePictureButtonCallback()
@@ -26,14 +23,7 @@ public class PhotoManager : MonoBehaviour
                 if (texture == null)
                     return;
 
-                // UI: cropping aşamasında container aktif olsun, buton inaktif olsun
-                if (photoCropUI != null)
-                    photoCropUI.gameObject.SetActive(true);
-                if (takePictureButton != null)
-                    takePictureButton.interactable = false;
-
-                // Send original texture for manual cropping
-                photoCropUI.OnPhotoReadyForCrop(texture);
+                UIManager.Instance?.BeginCrop(texture);
             }
         });
     }
@@ -42,12 +32,8 @@ public class PhotoManager : MonoBehaviour
     public void ApplyManualCrop(Texture2D originalTexture, Rect cropRect)
     {
         Texture2D croppedTexture = CropTexture(originalTexture, cropRect);
-        photoCropUI.OnPhotoTaken(croppedTexture);
+        UIManager.Instance?.FinishCrop(croppedTexture);
         onPhotoTaken?.Invoke(croppedTexture);
-
-        // Cropping bitti: butonu tekrar aktif et
-        if (takePictureButton != null)
-            takePictureButton.interactable = true;
     }
 
     // Apply manual crop with relative coordinates
