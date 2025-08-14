@@ -57,6 +57,9 @@ public class UIManager : MonoBehaviour
             menuRoot.SetActive(false);
         if (gameUiRoot != null)
             gameUiRoot.SetActive(true);
+
+        // Launch puzzle with the newly cropped texture
+        StartPuzzleFromTexture(croppedTexture);
     }
 
     private void HandleCropCanceled()
@@ -71,6 +74,10 @@ public class UIManager : MonoBehaviour
 
     public void OnGameBackButtonClicked()
     {
+        var generator = FindObjectOfType<PuzzleGenerator>();
+        if (generator != null)
+            generator.ClearPuzzle();
+
         if (cropPanel != null)
             cropPanel.SetActive(false);
         if (photoCropUI != null)
@@ -81,5 +88,24 @@ public class UIManager : MonoBehaviour
             menuRoot.SetActive(true);
         if (takePictureButton != null)
             takePictureButton.interactable = true;
+    }
+
+    public void StartPuzzleFromTexture(Texture2D texture)
+    {
+        if (menuRoot != null)
+            menuRoot.SetActive(false);
+        if (gameUiRoot != null)
+            gameUiRoot.SetActive(true);
+
+        var generator = FindObjectOfType<PuzzleGenerator>();
+        if (generator != null && texture != null)
+        {
+            generator.SetTextureAndGenerate(texture);
+        }
+    }
+
+    public bool IsMenuOpen
+    {
+        get { return menuRoot != null && menuRoot.activeInHierarchy; }
     }
 }

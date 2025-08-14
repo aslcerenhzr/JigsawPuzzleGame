@@ -26,6 +26,10 @@ public class InputManager : MonoBehaviour
 
     private void ManageInput()
     {
+        // If menu UI is open, block gameplay inputs
+        if (UIManager.Instance != null && UIManager.Instance.IsMenuOpen)
+            return;
+
         // Eğer crop UI aktifse, öncelik kırpma kontrolünde
         if (photoCropUI != null && photoCropUI.gameObject.activeInHierarchy)
         {

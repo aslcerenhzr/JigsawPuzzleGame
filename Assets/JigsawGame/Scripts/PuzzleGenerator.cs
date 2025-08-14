@@ -12,6 +12,7 @@ public class PuzzleGenerator : MonoBehaviour
     [SerializeField] private int gridSize;
     private float gridScale;
     private List<PuzzlePiece> puzzlePieces = new List<PuzzlePiece>();
+    private Texture2D currentTexture;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -26,7 +27,12 @@ public class PuzzleGenerator : MonoBehaviour
 
     public void GeneratePuzzle()
     {
+        // Clear existing
         puzzlePieces.Clear();
+        for (int c = transform.childCount - 1; c >= 0; c--)
+        {
+            Destroy(transform.GetChild(c).gameObject);
+        }
 
         Vector3 startPos = Vector2.left * (gridSize * gridScale) / 2 + Vector2.down * (gridSize * gridScale) / 2;
         
@@ -52,11 +58,31 @@ public class PuzzleGenerator : MonoBehaviour
                 Vector2 tiling = new Vector2(1f / gridSize, 1f / gridSize);
                 Vector2 offset = new Vector2((float)i /gridSize, (float)j /gridSize);
 
+                if (currentTexture != null)
+                {
+                    puzzlePieceInstance.SetTexture(currentTexture);
+                }
+
                 puzzlePieceInstance.Configure(gridScale, tiling, offset, correctPos);
             }
         }
 
         ConfigurePieces();
+    }
+
+    public void SetTextureAndGenerate(Texture2D texture)
+    {
+        currentTexture = texture;
+        GeneratePuzzle();
+    }
+
+    public void ClearPuzzle()
+    {
+        puzzlePieces.Clear();
+        for (int c = transform.childCount - 1; c >= 0; c--)
+        {
+            Destroy(transform.GetChild(c).gameObject);
+        }
     }
 
     private void ConfigurePieces()

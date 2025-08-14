@@ -31,6 +31,14 @@ public class PuzzlePiece : MonoBehaviour, IComparable<PuzzlePiece>
         this.correctPosition = correctPos;
     }
 
+    public void SetTexture(Texture2D texture)
+    {
+        if (renderer != null && texture != null)
+        {
+            renderer.material.mainTexture = texture;
+        }
+    }
+
     public void ConfigureGenerator(int[] trits, float[] offsets)
     {
         generator.Configure(trits, offsets);
